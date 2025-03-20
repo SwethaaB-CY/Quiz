@@ -79,7 +79,7 @@ export default function Home() {
 
       <motion.input
         type="text"
-        placeholder="Enter Topic"
+        placeholder="Enter Topic !"
         value={topic}
         onChange={(e) => setTopic(e.target.value)}
         whileFocus={{ scale: 1.05 }}
