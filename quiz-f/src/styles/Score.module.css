@@ -1,0 +1,104 @@
+/* Score.module.css */
+.scoreContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background-color: #fff;
+    padding: 20px;
+  }
+  
+  .scoreCard {
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 100%;
+    max-width: 500px;
+  }
+  
+  .scoreCard h1 {
+    font-size: 3rem;
+    color: #76cedf; /* light blue */
+    margin-bottom: 10px;
+  }
+  
+  .scoreCard p {
+    font-size: 1.5rem;
+    color: #333;
+    margin-top: 20px;
+    font-weight: bold;
+  }
+  
+  .retryButton {
+    margin-top: 30px;
+    padding: 12px 25px;
+    font-size: 1.2rem;
+    color: white;
+    background-color: #76cedf; /* light blue */
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+  }
+  
+  .retryButton:hover {
+    transform: scale(1.1);
+    background-color: #99d4bf; /* light green */
+  }
+  
+  .retryButton:active {
+    transform: scale(0.95);
+  }
+
+  /* styles/Score.module.css */
+.scoreContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #fff;
+  }
+  
+  .scoreCard {
+    background-color: #f1f1f1;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 300px;
+    transition: transform 0.3s ease-in-out;
+  }
+  
+  .scoreCard h1 {
+    font-size: 2rem;
+    color: #333;
+  }
+  
+  .scoreCard p {
+    font-size: 1.2rem;
+    margin: 10px 0;
+    color: #555;
+  }
+  
+  .retryButton {
+    padding: 10px 20px;
+    background-color: #76cedf; /* Primary light blue */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .retryButton:hover {
+    background-color: #99d4bf; /* Light green */
+  }
+  
+  .retryButton:active {
+    background-color: #f68c1f; /* Orange */
+  }
+  

@@ -1,0 +1,78 @@
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background: white;
+  color: black;
+  text-align: center;
+  overflow: hidden; /* Prevent scrollbars due to floating icons */
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  position: relative;
+}
+
+input {
+  width: 320px;
+  padding: 14px;
+  margin: 14px;
+  border: 2px solid #76cedf;
+  border-radius: 12px;
+  font-size: 20px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+input:focus {
+  border-color: #fecf0a;
+  outline: none;
+  transform: scale(1.05);
+}
+
+button {
+  background: #f68c1f;
+  color: white;
+  padding: 16px 28px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 22px;
+  margin-top: 15px;
+  transition: all 0.3s ease;
+}
+
+button:hover {
+  background: #fecf0a;
+  transform: scale(1.1);
+}
+
+/* Floating Icons Animation */
+.icon {
+  position: absolute;
+  font-size: 50px;
+  opacity: 0.2;
+  animation: float 10s ease-in-out infinite alternate;
+}
+
+@keyframes float {
+  0% { transform: translateY(0) rotate(0); }
+  50% { transform: translateY(-50px) rotate(180deg); }
+  100% { transform: translateY(0) rotate(360deg); }
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+  input {
+    width: 280px;
+    font-size: 18px;
+  }
+
+  button {
+    font-size: 20px;
+    padding: 14px 24px;
+  }
+}
