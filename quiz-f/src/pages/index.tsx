@@ -10,31 +10,39 @@ export default function Home() {
 
   const handleGenerateQuiz = async () => {
     try {
-      setLoading(true);
-      
-      const response = await fetch("http://localhost:8000/generate-quiz", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ topic, numQuestions }),
-      });
-  
-      if (!response.ok) throw new Error(`HTTP Error! Status: ${response.status}`);
-  
-      const data = await response.json();
-      console.log("Quiz Data:", data);
-  
-      router.push({
-        pathname: "/quiz",
-        query: { quizData: JSON.stringify(data.quiz) },
-      });
-  
+        setLoading(true);
+
+        const requestBody = {
+            topic: topic.trim(), // Ensure no extra spaces
+            num_questions: Number(numQuestions) // ✅ Convert to integer & match FastAPI schema
+        };
+
+        console.log("DEBUG: Sending Request", requestBody); // 🔍 Debugging
+
+        const response = await fetch("http://127.0.0.1:8000/generate-quiz", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(requestBody),
+        });
+
+        if (!response.ok) throw new Error(`HTTP Error! Status: ${response.status}`);
+
+        const data = await response.json();
+        console.log("DEBUG: Received Quiz Data", data); // 🔍 Debugging
+
+        router.push({
+            pathname: "/quiz",
+            query: { quizData: JSON.stringify(data.quiz) },
+        });
+
     } catch (error) {
-      console.error("Failed to fetch quiz:", error);
-      alert("Failed to fetch quiz. Check the backend.");
+        console.error("Failed to fetch quiz:", error);
+        alert("Failed to fetch quiz. Check the backend.");
     } finally {
-      setLoading(false);
+        setLoading(false);
     }
-  };
+};
+
   
 
   return (
