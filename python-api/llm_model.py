@@ -1,99 +1,84 @@
+import google.generativeai as genai
 import os
 import json
-import torch
-import re
-from transformers import AutoModelForCausalLM, AutoTokenizer
+import time
+import random
+from Levenshtein import ratio  # Used to check for duplicate questions
 
-# Load Hugging Face Token
-token = os.environ.get("HF_TOKEN", "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")
-model_name = "meta-llama/Llama-3.2-1B-Instruct"
+# ✅ Google Gemini API Key (Use your actual key)
+API_KEY = os.getenv("GEMINI_API_KEY", "AIzaSyDpI0QJMWxLdaTDRqcTw8JTDNUbz-MH6dM")
 
-# Load Model
-try:
-    print("Loading model...")
-    model = AutoModelForCausalLM.from_pretrained(model_name, token=token)
-    tokenizer = AutoTokenizer.from_pretrained(model_name, token=token)
-    print("Model loaded successfully!")
-except OSError as e:
-    print(json.dumps({"error": f"Failed to load model: {str(e)}"}))
-    model, tokenizer = None, None  # Prevent further errors if loading fails
+# ✅ Configure Google Gemini API
+genai.configure(api_key=API_KEY)
+MODEL = genai.GenerativeModel('gemini-2.0-flash')
 
+def generate_question(topic):
+    """Generate a unique MCQ using Google Gemini."""
+    prompt = f"""
+    Create a UNIQUE multiple-choice question about {topic} in this EXACT JSON format:
+    {{
+      "question": "Clear question text here",
+      "choices": ["A: Option 1", "B: Option 2", "C: Option 3", "D: Option 4"],
+      "correctAnswer": "A"
+    }}
+    - No markdown
+    - Correct answer must be in choices
+    - `correctAnswer` must be in the format "A", "B", "C", or "D"
+    - Only output JSON
+    """.strip()
 
-import re
+    try:
+        response = MODEL.generate_content(prompt)
+        raw_text = response.candidates[0].content.parts[0].text.strip()
+        cleaned = raw_text.replace('```json', '').replace('```', '').strip()
 
-import re
+        data = json.loads(cleaned)
 
-def parse_generated_text(text):
-    lines = text.strip().split("\n")
-    question = ""
-    choices = []
-    correct_answer = ""
+        # ✅ Ensure correct answer format
+        correct_letter = data["correctAnswer"].strip().upper()  # "A"
+        correct_choice = next((c for c in data["choices"] if c.startswith(f"{correct_letter}:")), None)
 
-    for line in lines:
-        line = line.strip()
-        
-        # Extract question
-        if line.lower().startswith("question:"):
-            question = line.split(":", 1)[1].strip()
-        
-        # Extract choices
-        elif re.match(r"^[A-D]\)", line):  # Match "A) ...", "B) ..."
-            choice_text = line.strip()
-            # Filter out placeholders like "A) <option 1>"
-            if "<option" not in choice_text:
-                choices.append(choice_text)
+        if correct_choice:
+            data["correctAnswer"] = correct_choice  # ✅ Now stores "A: Option 1"
 
-        # Extract correct answer
-        elif line.lower().startswith("correct answer:"):
-            correct_answer = line.split(":", 1)[1].strip()
+        return data if len(data['choices']) == 4 else None
+    except:
+        return None
 
-    # Ensure valid data and set defaults if necessary
-    if not question or not choices or not correct_answer:
-        return {"error": "Invalid question generated. Please try again."}
-
-    # Ensure the correct answer is within the choices
-    if correct_answer not in choices:
-        correct_answer = choices[0] if choices else ""
-
-    return {
-        "question": question,
-        "choices": choices,
-        "correctAnswer": correct_answer
-    }
-
-
-
-
+def is_unique(new_q, existing, threshold=0.8):
+    """Check for duplicates using both exact match and similarity."""
+    for q in existing:
+        if new_q['question'] == q['question']:
+            return False
+        if ratio(new_q['question'], q['question']) > threshold:
+            return False
+    return True
 
 def generate_mcqs(topic, num_questions=5):
-    mcqs = []
-    for _ in range(num_questions):
-        prompt = (
-            f"Generate a multiple-choice question on the topic: {topic}.\n"
-            "Format the response exactly as follows:\n\n"
-            "Question: <your question here>\n"
-            "A) <option 1>\n"
-            "B) <option 2>\n"
-            "C) <option 3>\n"
-            "D) <option 4>\n"
-            "Correct answer: <A/B/C/D>\n\n"
-            "Ensure each option is a valid answer choice related to the question. Do not use placeholders."
-        )
+    """Generate multiple MCQs for a given topic using Google Gemini."""
+    questions = []
+    attempts = 0
 
-        inputs = tokenizer(prompt, return_tensors="pt")
+    while len(questions) < num_questions and attempts < 15:
+        try:
+            time.sleep(random.uniform(3, 7))  # ✅ Rate limiting
 
-        with torch.no_grad():
-            outputs = model.generate(**inputs, max_new_tokens=150)
+            q_data = generate_question(topic)
 
-        generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True)
-        mcq = parse_generated_text(generated_text)
-        mcqs.append(mcq)
+            if q_data and is_unique(q_data, questions):
+                questions.append(q_data)
+            else:
+                attempts += 1
+                time.sleep(10 if attempts % 3 == 0 else 5)
 
-    return mcqs
+        except Exception as e:
+            print(f"Error: {e}")
+            attempts += 1
+            time.sleep(30)
 
+    return questions
 
-
-# Test script execution
+# ✅ Test Script Execution
 if __name__ == "__main__":
     topic = "Python"
     num_questions = 1
