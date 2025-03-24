@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
@@ -12,7 +11,13 @@ const floatingIcons = [
 export default function Quiz() {
   const router = useRouter();
   const { quizData } = router.query;
-  const [questions, setQuestions] = useState<any[]>([]);
+  type Question = {
+    question: string;
+    choices: string[];
+    correctAnswer: string;
+  };
+
+  const [questions, setQuestions] = useState<Question[]>([]);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [isAnswered, setIsAnswered] = useState(false);
@@ -72,7 +77,7 @@ export default function Quiz() {
   const handleSubmit = async () => {
     try {
       const quizSubmission = {
-        title: quizTitle, // ✅ Use title from first question
+        title: quizTitle,
         totalQuestions: questions.length,
         score: score,
       };
@@ -80,6 +85,7 @@ export default function Quiz() {
       await submitQuiz(quizSubmission);
       alert("Quiz submitted successfully!");
     } catch (error) {
+      console.error("Error submitting quiz:", error);
       alert("Error submitting quiz.");
     }
   };
@@ -118,9 +124,7 @@ export default function Quiz() {
       ))}
 
       {/* Quiz Title */}
-      <h1 className={styles.quizTitle}>{quizTitle}</h1>  // ✅ Show topic as title
-
-
+      <h1 className={styles.quizTitle}>{quizTitle}</h1>  
       {/* Progress Bar */}
       <div className={styles.progressBar}>
         <div className={styles.progress} style={{ width: `${((currentQuestion + 1) / questions.length) * 100}%` }} />

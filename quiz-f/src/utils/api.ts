@@ -31,7 +31,10 @@ export const fetchToken = () => {
       console.log('✅ Quiz submitted successfully:', response.data);
       return response.data;
     } catch (error) {
-      console.error('❌ Error submitting quiz:', (error as any).response?.data || (error as any).message);
+      if (axios.isAxiosError(error)) {
+        console.error('❌ Error submitting quiz:', error.response?.data || error.message);
+      } else {
+        console.error('❌ Unexpected error:', error);
+      }
     }
   };
-  
