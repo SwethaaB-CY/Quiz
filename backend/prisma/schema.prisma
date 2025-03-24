@@ -1,0 +1,52 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+model User {
+  id               String    @id @default(uuid())
+  fullName         String
+  email            String    @unique
+  password         String
+  userType         String
+  resetToken       String?
+  resetTokenExpiry DateTime?
+
+  phoneNumber    String?
+  gender         String?
+  profilePicture String?
+
+  student Student?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Student {
+  userId String @id
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  collegeName String
+  skills      Json?
+
+  quizAttempts Quiz[] // ✅ Student is linked to multiple Quiz attempts
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Quiz {
+  id             String  @id @default(uuid())
+  userId         String  // Links to the Student
+  student        Student @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  title          String
+  totalQuestions Int
+  score          Int
+  createdAt      DateTime @default(now())
+}

@@ -1,11 +1,13 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { QuizModule } from './quiz/quiz.module'; // ✅ Import QuizModule
+import { QuizModule } from './quiz/quiz.module';
+import { AuthModule } from './auth/auth.module';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
-  imports: [QuizModule], // ✅ Import the QuizModule
-  controllers: [AppController],
-  providers: [AppService], // ✅ No need to manually add QuizService here
+  imports: [
+    HttpModule,
+    QuizModule, // ✅ Import QuizModule
+    AuthModule, // ✅ Import AuthModule
+  ],
 })
 export class AppModule {}

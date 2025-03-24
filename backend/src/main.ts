@@ -1,17 +1,18 @@
-/* eslint-disable @typescript-eslint/no-floating-promises */
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { Logger } from '@nestjs/common';
+import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+    const app = await NestFactory.create(AppModule);
 
-  // Enable CORS to allow frontend requests
-  app.enableCors();
+    app.use(cookieParser()); // ✅ Enables reading cookies from requests
 
-  const PORT = process.env.PORT || 5000;
-  await app.listen(PORT);
-  Logger.log(`🚀 Server running on http://localhost:${PORT}`);
+    app.enableCors({
+      origin: ["http://localhost:3000", "http://localhost:3001"],
+      credentials: true, // ✅ Allow cookies
+    });
+    
+
+    await app.listen(5001);
 }
-
 bootstrap();

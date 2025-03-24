@@ -1,35 +1,35 @@
+import { useEffect } from "react";
 import { useRouter } from "next/router";
-import { motion } from "framer-motion";
-import styles from "../styles/Score.module.css"; // Adjust the path if needed
+import axios from "axios";
 
 export default function Score() {
   const router = useRouter();
-  const { score, total } = router.query; // Destructure score and total from query
+  const { score, total, title } = router.query; // Make sure title is included
 
-  const handleRetry = () => {
-    router.push("/"); // Redirect to the home page or quiz start page
-  };
+  useEffect(() => {
+    if (score && total && title) {
+      const submitQuizResult = async () => {
+        try {
+          const token = localStorage.getItem("token"); // Get JWT token
+          await axios.post(
+            "http://localhost:5000/quiz/submit", // Send to Project A
+            { title, totalQuestions: Number(total), score: Number(score) },
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+        } catch (error) {
+          console.error("Error saving quiz result:", error);
+        }
+      };
+
+      submitQuizResult();
+    }
+  }, [score, total, title]);
 
   return (
-    <div className={styles.scoreContainer}>
-      <motion.div
-        className={styles.scoreCard}
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <h1>Quiz Completed! 🎉</h1>
-        <p>Your Score: {score} / {total}</p>
-
-        <motion.button
-          className={styles.retryButton}
-          onClick={handleRetry}
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          Retry Quiz
-        </motion.button>
-      </motion.div>
+    <div>
+      <h1>Quiz Completed!</h1>
+      <p>Your Score: {score} / {total}</p>
+      <button onClick={() => router.push("/")}>Retry Quiz</button>
     </div>
   );
 }

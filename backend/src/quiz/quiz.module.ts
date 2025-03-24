@@ -1,10 +1,11 @@
+// filepath: c:\Users\Swetha Balu\OneDrive\Desktop\Q\backend\src\quiz\quiz.module.ts
 import { Module } from '@nestjs/common';
-import { HttpModule } from '@nestjs/axios';
-import { QuizService } from './quiz.service';
 import { QuizController } from './quiz.controller';
+import { QuizService } from './quiz.service';
+import { PrismaModule } from '../prisma/prisma.module';
 
 @Module({
-  imports: [HttpModule],
+  imports: [PrismaModule], // ✅ No need to import AuthModule if it's global
   controllers: [QuizController],
   providers: [QuizService],
 })

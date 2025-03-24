@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import styles from "../styles/Quiz.module.css";
+import { submitQuiz } from "@/utils/api";
 
 const floatingIcons = [
   "📖", "✏️", "🏫", "🎓", "🖥️", "🎶", "🚀", "📜", "⚛️", "🏆", "📚", "📝", "🔢", "🌍", "💡", "🎨", "🔎", "📅"
@@ -17,6 +18,8 @@ export default function Quiz() {
   const [isAnswered, setIsAnswered] = useState(false);
   const [evaluation, setEvaluation] = useState<string | null>(null); // To store correct/incorrect evaluation
   const [score, setScore] = useState(0); // To store the user's score
+  const [quizTitle, setQuizTitle] = useState<string>("Quiz"); // Default title
+
 
   // Load quiz data from query
   useEffect(() => {
@@ -34,7 +37,13 @@ export default function Quiz() {
         router.push("/");
       }
     }
-  }, [quizData, router]);
+  
+    // ✅ Retrieve topic from query and set as quiz title
+    if (router.query.topic) {
+      setQuizTitle(router.query.topic as string);
+    }
+  }, [quizData, router.query.topic, router]);
+  
 
   // Handle answer selection and evaluate correctness
   const handleOptionClick = (option: string) => {
@@ -53,28 +62,48 @@ export default function Quiz() {
   };
 
   // Proceed to next question or finish quiz
-  const nextQuestion = () => {
-    if (currentQuestion < questions.length - 1) {
-      setCurrentQuestion((prev) => prev + 1);
-      setSelectedOption(null);
-      setEvaluation(null);
-      setIsAnswered(false);
-    } else {
-      // Redirect to score page with the score
-      router.push({
-        pathname: "/score",
-        query: { score: score, total: questions.length },
-      });
-    }
-  };
+  
 
   // Show loading if questions are not loaded yet
   if (questions.length === 0) {
     return <div className={styles.loading}>Loading Quiz...</div>;
   }
 
+  const handleSubmit = async () => {
+    try {
+      const quizSubmission = {
+        title: quizTitle, // ✅ Use title from first question
+        totalQuestions: questions.length,
+        score: score,
+      };
+      console.log("Submitting quiz:", quizSubmission);
+      await submitQuiz(quizSubmission);
+      alert("Quiz submitted successfully!");
+    } catch (error) {
+      alert("Error submitting quiz.");
+    }
+  };
+  
+
+  // Proceed to next question or finish quiz
+  const nextQuestion = async () => {
+    if (currentQuestion < questions.length - 1) {
+      setCurrentQuestion((prev) => prev + 1);
+      setSelectedOption(null);
+      setEvaluation(null);
+      setIsAnswered(false);
+    } else {
+      await handleSubmit(); // ✅ Ensure quiz is submitted first
+      router.push({ pathname: "/score", query: { score: score, total: questions.length } });
+    }
+  };
+  
+  
+  
+
   return (
     <div className={styles.quizContainer}>
+
       {/* Floating Background Icons */}
       {floatingIcons.map((icon, index) => (
         <motion.div
@@ -87,6 +116,10 @@ export default function Quiz() {
           {icon}
         </motion.div>
       ))}
+
+      {/* Quiz Title */}
+      <h1 className={styles.quizTitle}>{quizTitle}</h1>  // ✅ Show topic as title
+
 
       {/* Progress Bar */}
       <div className={styles.progressBar}>

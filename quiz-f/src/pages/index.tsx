@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { motion } from "framer-motion";
 
@@ -7,6 +7,22 @@ export default function Home() {
   const [numQuestions, setNumQuestions] = useState(5);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    const token = new URLSearchParams(window.location.search).get("token");
+  
+    if (token) {
+      console.log("🔥 Token received from Main Project:", token);
+  
+      // ✅ Store token in localStorage
+      localStorage.setItem("token", token);
+  
+      // ✅ Store token in Cookies (for backend requests)
+      document.cookie = `token=${token}; path=/; SameSite=None; Secure`;
+    }
+  }, []);
+  
+  
 
   const handleGenerateQuiz = async () => {
     try {
@@ -31,8 +47,8 @@ export default function Home() {
         console.log("DEBUG: Received Quiz Data", data); // 🔍 Debugging
 
         router.push({
-            pathname: "/quiz",
-            query: { quizData: JSON.stringify(data.quiz) },
+          pathname: "/quiz",
+          query: { quizData: JSON.stringify(data.quiz), topic: topic.trim() }, // ✅ Pass topic
         });
 
     } catch (error) {
