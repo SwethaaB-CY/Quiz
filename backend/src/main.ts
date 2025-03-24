@@ -1,10 +1,10 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import * as express from 'express';
+import express from 'express'; // ✅ Correct import (no alias)
 import { ExpressAdapter } from '@nestjs/platform-express';
 import * as cookieParser from 'cookie-parser';
 
-const server = express(); // ✅ Create an Express instance
+const server = express(); // ✅ Correct way to create an Express instance
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule, new ExpressAdapter(server));
@@ -16,7 +16,7 @@ async function bootstrap() {
       credentials: true, // ✅ Allow cookies
     });
 
-    await app.init(); // ✅ Initialize the NestJS app
+    await app.init(); // ✅ Initialize NestJS app
 }
 
 bootstrap();
