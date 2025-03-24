@@ -2,10 +2,10 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import express from 'express'; // ✅ Correct import
 import { ExpressAdapter } from '@nestjs/platform-express';
-import * as cookieParser from 'cookie-parser';
+import cookieParser from 'cookie-parser'; // ✅ Correct import
 
 async function bootstrap() {
-    const server = express(); // ✅ Correct usage of Express
+    const server = express(); // ✅ Correct Express instance
 
     const app = await NestFactory.create(AppModule, new ExpressAdapter(server));
 
@@ -18,7 +18,7 @@ async function bootstrap() {
 
     await app.init(); // ✅ Initialize NestJS app
 
-    return server; // ✅ Return the Express server
+    return server; // ✅ Return Express server for Vercel
 }
 
-export default bootstrap(); // ✅ Correctly export the server for Vercel
+export default bootstrap(); // ✅ Correctly export for Vercel
