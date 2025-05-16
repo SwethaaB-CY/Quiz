@@ -56,19 +56,21 @@ export default function Quiz() {
   };
 
   const handleSubmit = async () => {
-    try {
-      const quizSubmission = {
-        title: quizTitle,
-        totalQuestions: questions.length,
-        score: score,
-      };
-      console.log("Submitting quiz:", quizSubmission);
-      await submitQuiz(quizSubmission);
-      alert("Quiz submitted successfully!");
-    } catch (error) {
-      alert("Error submitting quiz.");
-    }
-  };
+  try {
+    const quizSubmission = {
+      title: quizTitle,
+      totalQuestions: questions.length,
+      score: score,
+    };
+    console.log("Submitting quiz:", quizSubmission);
+    await submitQuiz(quizSubmission);
+    alert("Quiz submitted successfully!");
+  } catch (error) {
+    console.error("Error submitting quiz:", error);
+    alert("Error submitting quiz.");
+  }
+};
+
 
   const nextQuestion = async () => {
     if (currentQuestion < questions.length - 1) {
