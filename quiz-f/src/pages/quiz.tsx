@@ -1,3 +1,4 @@
+// src/pages/quiz.tsx
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
@@ -16,12 +17,10 @@ export default function Quiz() {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [isAnswered, setIsAnswered] = useState(false);
-  const [evaluation, setEvaluation] = useState<string | null>(null); // To store correct/incorrect evaluation
-  const [score, setScore] = useState(0); // To store the user's score
-  const [quizTitle, setQuizTitle] = useState<string>("Quiz"); // Default title
+  const [evaluation, setEvaluation] = useState<string | null>(null);
+  const [score, setScore] = useState(0);
+  const [quizTitle, setQuizTitle] = useState<string>("Quiz");
 
-
-  // Load quiz data from query
   useEffect(() => {
     if (quizData) {
       try {
@@ -37,23 +36,18 @@ export default function Quiz() {
         router.push("/");
       }
     }
-  
-    // ✅ Retrieve topic from query and set as quiz title
+
     if (router.query.topic) {
       setQuizTitle(router.query.topic as string);
     }
   }, [quizData, router.query.topic, router]);
-  
 
-  // Handle answer selection and evaluate correctness
   const handleOptionClick = (option: string) => {
     if (!isAnswered) {
       setSelectedOption(option);
-
-      // Check if the selected option is correct
       if (option === questions[currentQuestion].correctAnswer) {
         setEvaluation("Correct! ✅");
-        setScore((prevScore) => prevScore + 1); // Increase score for correct answer
+        setScore((prevScore) => prevScore + 1);
       } else {
         setEvaluation("Incorrect! ❌");
       }
@@ -61,18 +55,10 @@ export default function Quiz() {
     }
   };
 
-  // Proceed to next question or finish quiz
-  
-
-  // Show loading if questions are not loaded yet
-  if (questions.length === 0) {
-    return <div className={styles.loading}>Loading Quiz...</div>;
-  }
-
   const handleSubmit = async () => {
     try {
       const quizSubmission = {
-        title: quizTitle, // ✅ Use title from first question
+        title: quizTitle,
         totalQuestions: questions.length,
         score: score,
       };
@@ -83,9 +69,7 @@ export default function Quiz() {
       alert("Error submitting quiz.");
     }
   };
-  
 
-  // Proceed to next question or finish quiz
   const nextQuestion = async () => {
     if (currentQuestion < questions.length - 1) {
       setCurrentQuestion((prev) => prev + 1);
@@ -93,17 +77,17 @@ export default function Quiz() {
       setEvaluation(null);
       setIsAnswered(false);
     } else {
-      await handleSubmit(); // ✅ Ensure quiz is submitted first
+      await handleSubmit();
       router.push({ pathname: "/score", query: { score: score, total: questions.length } });
     }
   };
-  
-  
-  
+
+  if (questions.length === 0) {
+    return <div className={styles.loading}>Loading Quiz...</div>;
+  }
 
   return (
     <div className={styles.quizContainer}>
-
       {/* Floating Background Icons */}
       {floatingIcons.map((icon, index) => (
         <motion.div
@@ -118,15 +102,14 @@ export default function Quiz() {
       ))}
 
       {/* Quiz Title */}
-      <h1 className={styles.quizTitle}>{quizTitle}</h1>  // ✅ Show topic as title
-
+      <h1 className={styles.quizTitle}>{quizTitle}</h1>
 
       {/* Progress Bar */}
       <div className={styles.progressBar}>
         <div className={styles.progress} style={{ width: `${((currentQuestion + 1) / questions.length) * 100}%` }} />
       </div>
 
-      {/* Question Card with Smooth Transition */}
+      {/* Question Card */}
       <motion.div
         key={currentQuestion}
         className={styles.questionCard}
@@ -147,7 +130,7 @@ export default function Quiz() {
               whileTap={{ scale: 0.95 }}
               animate={selectedOption === option ? { scale: [1, 1.1, 1] } : {}}
               transition={{ duration: 0.3 }}
-              disabled={isAnswered} // Disable button after answering
+              disabled={isAnswered}
             >
               {option}
             </motion.button>
@@ -158,7 +141,7 @@ export default function Quiz() {
         {evaluation && <p className={styles.evaluation}>{evaluation}</p>}
       </motion.div>
 
-      {/* Next Button (Disabled when answering or on the last question) */}
+      {/* Next Button */}
       <motion.button
         className={styles.nextButton}
         onClick={nextQuestion}
